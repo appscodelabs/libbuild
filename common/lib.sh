@@ -15,6 +15,14 @@ inside_git_repo() {
 	fi
 }
 
+clone() {
+	if [ -x "$1" ]; then
+		echo "Please specify url of repo to clone"
+		exit 1
+	fi
+	local cmd="git clone $1"; echo $cmd; $cmd
+}
+
 # http://stackoverflow.com/a/36979153/244009
 checkout() {
 	if [ -x "$1" ]; then
