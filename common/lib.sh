@@ -20,7 +20,13 @@ clone() {
 		echo "Please specify url of repo to clone"
 		exit 1
 	fi
-	local cmd="git clone $1"; echo $cmd; $cmd
+	local url="$1"
+	shift
+	local folder=""
+	if [ "$#" -eq 1 ]; then
+		folder="$1"
+	fi
+	local cmd="git clone $url $folder"; echo $cmd; $cmd
 }
 
 # http://stackoverflow.com/a/36979153/244009
