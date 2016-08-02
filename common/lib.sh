@@ -26,7 +26,7 @@ clone() {
 	if [ "$#" -eq 1 ]; then
 		folder="$1"
 	fi
-	local cmd="git clone $url $folder"; echo $cmd; $cmd
+	local cmd="git clone $url $folder"; echo -e "\n"; echo $cmd; $cmd
 }
 
 # http://stackoverflow.com/a/36979153/244009
