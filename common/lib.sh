@@ -191,6 +191,8 @@ docker_sh() {
 }
 
 docker_rm() {
+	local cmd="docker stop $(docker ps)"
+	echo $cmd; $cmd
 	local cmd="docker rm -f $(docker ps -a)"
 	echo $cmd; $cmd
 }
