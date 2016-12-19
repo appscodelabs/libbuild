@@ -70,12 +70,9 @@ detect_tag() {
         TAG=$git_branch
         TAG_STRATEGY='git_branch'
     else
-		TAG="$git_tag"$(TZ=UTC date -d @$(git show -s --format=%ct) +"%Y%m%d")
-		nearest_tag=$(git describe --abbrev=0 2>/dev/null || echo '0.0')
-		if [ "$nearest_tag" != '' ]; then
-			TAG="${nearest_tag}.${TAG}"
-		fi
-		TAG_STRATEGY='commit_timestamp'
+		hash_ver=$(git describe --tags --always --dirty)
+		TAG="${hash_ver}"
+		TAG_STRATEGY='commit_hash'
     fi
 
     echo "TAG = $TAG"
