@@ -137,9 +137,10 @@ def to_upper_camel(lower_snake):
 # ref: https://golang.org/cmd/go/
 def go_build(name, goos, goarch, main):
     linker_opts = []
-    for k, v in metadata(REPO_ROOT, goos, goarch).items():
-        linker_opts.append('-X')
-        linker_opts.append('main.' + to_upper_camel(k) + '=' + v)
+    if BIN_MATRIX[name].get('go_version', False):
+        for k, v in metadata(REPO_ROOT, goos, goarch).items():
+            linker_opts.append('-X')
+            linker_opts.append('main.' + to_upper_camel(k) + '=' + v)
 
     cgo_env = 'CGO_ENABLED=0'
     cgo = ''
