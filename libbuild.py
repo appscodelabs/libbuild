@@ -4,10 +4,12 @@
 from __future__ import absolute_import
 
 import datetime
+import fnmatch
 import io
 import json
 import os
 import os.path
+import re
 import socket
 import subprocess
 import sys
@@ -230,3 +232,37 @@ def update_registry(version):
         call("gsutil cp {2} {0}/binaries/{1}/latest.txt".format(bucket, name, lf), cwd=REPO_ROOT)
         if BIN_MATRIX[name].get('release', False):
             call('gsutil acl ch -u AllUsers:R -r {0}/binaries/{1}/latest.txt'.format(bucket, name), cwd=REPO_ROOT)
+
+
+def ungroup_go_imports(*paths):
+    for p in paths:
+        if os.path.isfile(p):
+            _ungroup_file_imports(p)
+        elif os.path.isdir(p):
+            for dir, _, files in os.walk(p):
+                for f in fnmatch.filter(files, '*.go'):
+                    _ungroup_file_imports(dir + '/' + f)
+
+
+BEGIN_IMPORT_REGEX = ur'import \(\s*'
+END_IMPORT_REGEX = ur'\)\s*'
+
+
+def _ungroup_go_imports(fname):
+    with open(fname, 'r+') as f:
+        content = f.readlines()
+        out = []
+        import_block = False
+        for line in content:
+            c = line.strip()
+            if import_block:
+                if c == '':
+                    continue
+                elif re.match(END_IMPORT_REGEX, c) is not None:
+                    import_block = False
+            elif re.match(BEGIN_IMPORT_REGEX, c) is not None:
+                    import_block = True
+            out.append(line)
+        f.seek(0)
+        f.writelines(out)
+        f.truncate()
