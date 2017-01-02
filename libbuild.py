@@ -237,8 +237,10 @@ def update_registry(version):
 def ungroup_go_imports(*paths):
     for p in paths:
         if os.path.isfile(p):
+            print('Ungrouping imports of file: ' + p)
             _ungroup_go_imports(p)
         elif os.path.isdir(p):
+            print('Ungrouping imports of dir: ' + p)
             for dir, _, files in os.walk(p):
                 for f in fnmatch.filter(files, '*.go'):
                     _ungroup_go_imports(dir + '/' + f)
