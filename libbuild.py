@@ -109,9 +109,8 @@ def read_json(name):
 
 
 def write_json(obj, name):
-    with io.open(name, 'w') as f:
-        data = json.dumps(obj, indent=2, separators=(',', ': '), ensure_ascii=False)
-        f.write(data)
+    with io.open(name, 'w', encoding='utf-8') as f:
+        f.write(unicode(json.dumps(obj, indent=2, separators=(',', ': '), ensure_ascii=False)))
 
 
 def call(cmd, stdin=None, cwd=None):
