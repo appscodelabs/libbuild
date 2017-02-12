@@ -128,6 +128,17 @@ def check_output(cmd, stdin=None, cwd=None):
     return subprocess.check_output([expandvars(cmd)], shell=True, stdin=stdin, cwd=cwd)
 
 
+def deps():
+    die(call('go get -u golang.org/x/tools/cmd/goimports'))
+    die(call('go get -u golang.org/x/tools/cmd/stringer'))
+    die(call('go get -u github.com/Masterminds/glide'))
+    die(call('go get -u github.com/sgotti/glide-vc'))
+    die(call('go get -u github.com/jteeuwen/go-bindata/...'))
+    die(call('go get -u github.com/progrium/go-extpoints'))
+    die(call('go get -u github.com/tools/godep'))
+    die(call('go get -u github.com/uber/go-torch'))
+
+
 def to_upper_camel(lower_snake):
     components = lower_snake.split('_')
     # We capitalize the first letter of each component
