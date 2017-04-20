@@ -1,12 +1,14 @@
 #!/bin/bash
 
+DOCKER_REGISTRY=${DOCKER_REGISTRY:-k8sdb}
+
 # override this one if you need to change push & pull
 docker_push() {
-	hub_canary k8sdb
+	hub_canary
 }
 
 docker_pull() {
-	hub_pull k8sdb
+	hub_pull
 }
 
 
@@ -21,7 +23,7 @@ source_repo() {
 
 	case "$1" in
 		build)
-			build k8sdb
+			build
 			;;
 		build_binary)
 			build_binary
@@ -39,16 +41,16 @@ source_repo() {
 			docker_pull
 			;;
 		release)
-			docker_release k8sdb
+			docker_release
 			;;
 		check)
-			docker_check k8sdb
+			docker_check
 			;;
 		run)
-			docker_run k8sdb
+			docker_run
 			;;
 		sh)
-			docker_sh k8sdb
+			docker_sh
 			;;
 		rm)
 			docker_rm
@@ -74,28 +76,28 @@ binary_repo() {
 
 	case "$1" in
 		build)
-			build k8sdb
+			build
 			;;
 		clean)
 			clean
 			;;
 		push)
-			docker_up k8sdb $IMG:$TAG
+			docker_push
 			;;
 		pull)
-			docker_pull k8sdb
+			docker_pull
 			;;
 		release)
-			docker_release k8sdb
+			docker_release
 			;;
 		check)
-			docker_check k8sdb
+			docker_check
 			;;
 		run)
-			docker_run k8sdb
+			docker_run
 			;;
 		sh)
-			docker_sh k8sdb
+			docker_sh
 			;;
 		rm)
 			docker_rm

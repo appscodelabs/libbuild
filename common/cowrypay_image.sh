@@ -1,12 +1,14 @@
 #!/bin/bash
 
+DOCKER_REGISTRY=${DOCKER_REGISTRY:-cowrypay}
+
 # override this one if you need to change push & pull
 docker_push() {
-	hub_canary cowrypay
+	hub_canary
 }
 
 docker_pull() {
-	hub_pull cowrypay
+	hub_pull
 }
 
 
@@ -21,7 +23,7 @@ source_repo() {
 
 	case "$1" in
 		build)
-			build cowrypay
+			build
 			;;
 		build_binary)
 			build_binary
@@ -39,16 +41,16 @@ source_repo() {
 			docker_pull
 			;;
 		release)
-			docker_release cowrypay
+			docker_release
 			;;
 		check)
-			docker_check cowrypay
+			docker_check
 			;;
 		run)
-			docker_run cowrypay
+			docker_run
 			;;
 		sh)
-			docker_sh cowrypay
+			docker_sh
 			;;
 		rm)
 			docker_rm
@@ -74,28 +76,28 @@ binary_repo() {
 
 	case "$1" in
 		build)
-			build cowrypay
+			build
 			;;
 		clean)
 			clean
 			;;
 		push)
-			docker_up cowrypay $IMG:$TAG
+			docker_push
 			;;
 		pull)
-			docker_pull cowrypay
+			docker_pull
 			;;
 		release)
-			docker_release cowrypay
+			docker_release
 			;;
 		check)
-			docker_check cowrypay
+			docker_check
 			;;
 		run)
-			docker_run cowrypay
+			docker_run
 			;;
 		sh)
-			docker_sh cowrypay
+			docker_sh
 			;;
 		rm)
 			docker_rm
