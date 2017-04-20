@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# override this one if you need to change push & pull
+docker_push() {
+	hub_canary k8sdb
+}
+
+docker_pull() {
+	hub_pull k8sdb
+}
+
+
 source_repo() {
 	RETVAL=0
 
@@ -23,13 +33,10 @@ source_repo() {
 			clean
 			;;
 		push)
-			docker_up k8sdb $IMG:$TAG
+			docker_push
 			;;
 		pull)
-			docker_pull k8sdb
-			;;
-		gcr)
-			docker_gcr k8sdb
+			docker_pull
 			;;
 		release)
 			docker_release k8sdb
@@ -77,9 +84,6 @@ binary_repo() {
 			;;
 		pull)
 			docker_pull k8sdb
-			;;
-		gcr)
-			docker_gcr k8sdb
 			;;
 		release)
 			docker_release k8sdb

@@ -107,20 +107,24 @@ build() {
 }
 
 attic_up() {
-	local cmd="docker tag $1/$2 gcr.io/$GCR_PROJECT/$2"
+	local cmd="docker tag $1/$IMG:$TAG gcr.io/$GCR_PROJECT/$IMG:$TAG"
 	echo $cmd; $cmd
-	cmd="gcloud docker -- push gcr.io/$GCR_PROJECT/$2"
+	cmd="gcloud docker -- push gcr.io/$GCR_PROJECT/$IMG:$TAG"
 	echo $cmd; $cmd
 
-	local cmd="docker tag $1/$2 docker.appscode.com/$2"
+	local cmd="docker tag $1/$IMG:$TAG docker.appscode.com/$IMG:$TAG"
 	echo $cmd; $cmd
-	cmd="docker push docker.appscode.com/$2"
+	cmd="docker push docker.appscode.com/$IMG:$TAG"
 	echo $cmd; $cmd
 }
 
-docker_up() {
+hub_up() {
 	local cmd="docker push $1/$IMG:$TAG"
 	echo $cmd; $cmd
+}
+
+hub_canary() {
+	hub_up "$1"
 
 	local cmd="docker tag $1/$IMG:$TAG $1/$IMG:canary"
 	echo $cmd; $cmd
@@ -128,14 +132,14 @@ docker_up() {
 	echo $cmd; $cmd
 }
 
-docker_pull() {
+attic_pull() {
 	local cmd="docker pull docker.appscode.com/$IMG:$TAG"
 	echo $cmd; $cmd
 	cmd="docker tag docker.appscode.com/$IMG:$TAG $1/$IMG:$TAG"
 	echo $cmd; $cmd
 }
 
-docker_gcr() {
+gcr_pull() {
 	local cmd="gcloud docker -- pull gcr.io/$GCR_PROJECT/$IMG:$TAG"
 	echo $cmd; $cmd
 	cmd="docker tag gcr.io/$GCR_PROJECT/$IMG:$TAG $1/$IMG:$TAG"
@@ -143,8 +147,7 @@ docker_gcr() {
 }
 
 docker_release() {
-	local cmd="docker push $1/$IMG:$TAG"
-	echo $cmd; $cmd
+	hub_up "$1"
 }
 
 docker_check() {

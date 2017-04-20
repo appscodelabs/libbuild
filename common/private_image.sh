@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# override this one if you need to change push & pull
+docker_push() {
+	attic_up appscode
+}
+
+docker_pull() {
+	attic_pull appscode
+}
+
+
 source_repo() {
 	RETVAL=0
 
@@ -26,13 +36,13 @@ source_repo() {
 			clean
 			;;
 		push)
-			attic_up "$IMG:$TAG"
+			docker_push
 			;;
 		pull)
-			docker_pull appscode
+			docker_pull
 			;;
 		gcr)
-			docker_gcr appscode
+			gcr_pull appscode
 			;;
 		check)
 			docker_check appscode
@@ -73,13 +83,13 @@ binary_repo() {
 			clean
 			;;
 		push)
-			attic_up "$IMG:$TAG"
+			docker_push
 			;;
 		pull)
-			docker_pull appscode
+			docker_pull
 			;;
 		gcr)
-			docker_gcr appscode
+			gcr_pull appscode
 			;;
 		check)
 			docker_check appscode

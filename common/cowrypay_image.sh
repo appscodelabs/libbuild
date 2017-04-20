@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# override this one if you need to change push & pull
+docker_push() {
+	hub_canary cowrypay
+}
+
+docker_pull() {
+	hub_pull cowrypay
+}
+
+
 source_repo() {
 	RETVAL=0
 
@@ -23,13 +33,10 @@ source_repo() {
 			clean
 			;;
 		push)
-			docker_up cowrypay $IMG:$TAG
+			docker_push
 			;;
 		pull)
-			docker_pull cowrypay
-			;;
-		gcr)
-			docker_gcr cowrypay
+			docker_pull
 			;;
 		release)
 			docker_release cowrypay
@@ -77,9 +84,6 @@ binary_repo() {
 			;;
 		pull)
 			docker_pull cowrypay
-			;;
-		gcr)
-			docker_gcr cowrypay
 			;;
 		release)
 			docker_release cowrypay
