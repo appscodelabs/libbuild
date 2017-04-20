@@ -11,7 +11,7 @@ source_repo() {
 
 	case "$1" in
 		build)
-			build appscode
+			build k8sdb
 			;;
 		build_binary)
 			build_binary
@@ -23,25 +23,25 @@ source_repo() {
 			clean
 			;;
 		push)
-			attic_up $IMG:$TAG
+			docker_up k8sdb $IMG:$TAG
 			;;
 		pull)
-			docker_pull appscode
+			docker_pull k8sdb
 			;;
 		gcr)
-			docker_gcr appscode
+			docker_gcr k8sdb
 			;;
 		release)
-			docker_release appscode
+			docker_release k8sdb
 			;;
 		check)
-			docker_check appscode
+			docker_check k8sdb
 			;;
 		run)
-			docker_run appscode
+			docker_run k8sdb
 			;;
 		sh)
-			docker_sh appscode
+			docker_sh k8sdb
 			;;
 		rm)
 			docker_rm
@@ -67,31 +67,31 @@ binary_repo() {
 
 	case "$1" in
 		build)
-			build appscode
+			build k8sdb
 			;;
 		clean)
 			clean
 			;;
 		push)
-			attic_up $IMG:$TAG
+			docker_up k8sdb $IMG:$TAG
 			;;
 		pull)
-			docker_pull appscode
+			docker_pull k8sdb
 			;;
 		gcr)
-			docker_gcr appscode
+			docker_gcr k8sdb
 			;;
 		release)
-			docker_release appscode
+			docker_release k8sdb
 			;;
 		check)
-			docker_check appscode
+			docker_check k8sdb
 			;;
 		run)
-			docker_run appscode
+			docker_run k8sdb
 			;;
 		sh)
-			docker_sh appscode
+			docker_sh k8sdb
 			;;
 		rm)
 			docker_rm

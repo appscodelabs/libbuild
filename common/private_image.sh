@@ -11,7 +11,7 @@ source_repo() {
 
 	case "$1" in
 		build)
-			build
+			build appscode
 			;;
 		build_binary)
 			build_binary
@@ -26,22 +26,22 @@ source_repo() {
 			clean
 			;;
 		push)
-			docker_push
+			attic_up "$IMG:$TAG"
 			;;
 		pull)
-			docker_pull
+			docker_pull appscode
 			;;
 		gcr)
-			docker_gcr
+			docker_gcr appscode
 			;;
 		check)
-			docker_check
+			docker_check appscode
 			;;
 		run)
-			docker_run
+			docker_run appscode
 			;;
 		sh)
-			docker_sh
+			docker_sh appscode
 			;;
 		rm)
 			docker_rm
@@ -67,28 +67,28 @@ binary_repo() {
 
 	case "$1" in
 		build)
-			build
+			build appscode
 			;;
 		clean)
 			clean
 			;;
 		push)
-			docker_push
+			attic_up "$IMG:$TAG"
 			;;
 		pull)
-			docker_pull
+			docker_pull appscode
 			;;
 		gcr)
-			docker_gcr
+			docker_gcr appscode
 			;;
 		check)
-			docker_check
+			docker_check appscode
 			;;
 		run)
-			docker_run
+			docker_run appscode
 			;;
 		sh)
-			docker_sh
+			docker_sh appscode
 			;;
 		rm)
 			docker_rm

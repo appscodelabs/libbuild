@@ -11,7 +11,7 @@ source_repo() {
 
 	case "$1" in
 		build)
-			build appscode
+			build cowrypay
 			;;
 		build_binary)
 			build_binary
@@ -23,25 +23,25 @@ source_repo() {
 			clean
 			;;
 		push)
-			attic_up $IMG:$TAG
+			docker_up cowrypay $IMG:$TAG
 			;;
 		pull)
-			docker_pull appscode
+			docker_pull cowrypay
 			;;
 		gcr)
-			docker_gcr appscode
+			docker_gcr cowrypay
 			;;
 		release)
-			docker_release appscode
+			docker_release cowrypay
 			;;
 		check)
-			docker_check appscode
+			docker_check cowrypay
 			;;
 		run)
-			docker_run appscode
+			docker_run cowrypay
 			;;
 		sh)
-			docker_sh appscode
+			docker_sh cowrypay
 			;;
 		rm)
 			docker_rm
@@ -67,31 +67,31 @@ binary_repo() {
 
 	case "$1" in
 		build)
-			build appscode
+			build cowrypay
 			;;
 		clean)
 			clean
 			;;
 		push)
-			attic_up $IMG:$TAG
+			docker_up cowrypay $IMG:$TAG
 			;;
 		pull)
-			docker_pull appscode
+			docker_pull cowrypay
 			;;
 		gcr)
-			docker_gcr appscode
+			docker_gcr cowrypay
 			;;
 		release)
-			docker_release appscode
+			docker_release cowrypay
 			;;
 		check)
-			docker_check appscode
+			docker_check cowrypay
 			;;
 		run)
-			docker_run appscode
+			docker_run cowrypay
 			;;
 		sh)
-			docker_sh appscode
+			docker_sh cowrypay
 			;;
 		rm)
 			docker_rm
