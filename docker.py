@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
 
 api.py: Docker helper functions for Singularity in Python
@@ -21,35 +23,149 @@ perform publicly and display publicly, and to permit other to do so.
 
 '''
 
-import sys
-sys.path.append('..') # parent directory
+# Needed for antipackage with python 2
+from __future__ import absolute_import
 
-from utils import api_get, write_file, add_http
-from logman import logger
-import json
 import re
+import json
 import os
+import sys
 import tempfile
+import base64
 try:
+    from urllib.parse import urlencode, urlparse
+    from urllib.request import urlopen, Request, unquote
     from urllib.error import HTTPError
 except ImportError:
-    from urllib2 import HTTPError
+    from urllib import urlencode, unquote
+    from urlparse import urlparse
+    from urllib2 import urlopen, Request, HTTPError
 
-api_base = "index.docker.io"
+api_base = "https://index.docker.io"
 api_version = "v2"
 
 # Authentication not required ---------------------------------------------------------------------------------
 
-def create_runscript(cmd,base_dir):
-    '''create_runscript will write a bash script with command "cmd" into the base_dir
-    :param cmd: the command to write into the bash script
-    :param base_dir: the base directory to write the runscript to
+def api_get_pagination(url):
+    '''api_pagination is a wrapper for "api_get" that will also handle pagination
+    :param url: the url to retrieve:
+    :param default_header: include default_header (above)
+    :param headers: headers to add (default is None)
     '''
-    runscript = "%s/singularity" %(base_dir)
-    content = 'exec %s "$@"' %(cmd)
-    logger.info("Generating runscript at %s",runscript)
-    output_file = write_file(runscript,content)
-    return output_file
+    done = False
+    results = []
+    while not done:
+        response = api_get(url=url)
+        try:
+            response = json.loads(response)
+        except:
+            logger.error("Error parsing response for url %s, exiting.", url)
+            sys.exit(1)
+
+        # If we have a next url
+        if "next" in response:
+            url = response["next"]
+        else:
+            done = True
+
+        # Add new call to the results
+        results = results + response['results']
+    return results
+
+
+def parse_headers(default_header, headers=None):
+    '''parse_headers will return a completed header object, adding additional headers to some
+    default header
+    :param default_header: include default_header (above)
+    :param headers: headers to add (default is None)
+    '''
+
+    # default header for all calls
+    header = {'Accept': 'application/json', 'Content-Type': 'application/json; charset=utf-8'}
+
+    if default_header == True:
+        if headers != None:
+            final_headers = header.copy()
+            final_headers.update(headers)
+        else:
+            final_headers = header
+
+    else:
+        final_headers = headers
+        if headers == None:
+            final_headers = dict()
+
+    return final_headers
+
+
+def api_get(url, data=None, default_header=True, headers=None, stream=None, return_response=False):
+    '''api_get gets a url to the api with appropriate headers, and any optional data
+    :param data: a dictionary of key:value items to add to the data args variable
+    :param url: the url to get
+    :param stream: The name of a file to stream the response to. If defined, will stream
+    default is None (will not stream)
+    :returns response: the requests response object
+    '''
+    headers = parse_headers(default_header=default_header,
+                            headers=headers)
+
+    # Does the user want to stream a response?
+    do_stream = False
+    if stream != None:
+        do_stream = True
+
+    if data != None:
+        args = urlencode(data)
+        request = Request(url=url,
+                          data=args,
+                          headers=headers)
+    else:
+        request = Request(url=url,
+                          headers=headers)
+
+    try:
+        response = urlopen(request)
+
+    # If we have an HTTPError, try to follow the response
+    except HTTPError as error:
+        return error
+
+    # Does the call just want to return the response?
+    if return_response == True:
+        return response
+
+    if do_stream == False:
+        return response.read().decode('utf-8')
+
+    chunk_size = 1 << 20
+    with open(stream, 'wb') as filey:
+        while True:
+            chunk = response.read(chunk_size)
+            if not chunk:
+                break
+            try:
+                filey.write(chunk)
+            except:  # PermissionError
+                logger.error("Cannot write to %s, exiting", stream)
+                sys.exit(1)
+
+    return stream
+
+
+def basic_auth_header(username, password):
+    '''basic_auth_header will return a base64 encoded header object to
+    generate a token
+    :param username: the username
+    :param password: the password
+    '''
+    s = "%s:%s" % (username, password)
+    if sys.version_info[0] >= 3:
+        s = bytes(s, 'utf-8')
+        credentials = base64.b64encode(s).decode('utf-8')
+    else:
+        credentials = base64.b64encode(s)
+    auth = {"Authorization": "Basic %s" % credentials}
+    return auth
 
 
 def get_token(namespace,repo_name,registry=None,auth=None):
@@ -63,7 +179,6 @@ def get_token(namespace,repo_name,registry=None,auth=None):
     '''
     if registry == None:
         registry = api_base
-    registry = add_http(registry) # make sure we have a complete url
 
     # Check if we need a token at all by probing the tags/list endpoint.  This
     # is an arbitrary choice, ideally we should always attempt without a token
@@ -178,7 +293,6 @@ def get_tags(namespace,repo_name,registry=None,auth=None):
     '''
     if registry == None:
         registry = api_base
-    registry = add_http(registry) # make sure we have a complete url
 
     base = "%s/%s/%s/%s/tags/list" %(registry,api_version,namespace,repo_name)
     logger.info("Obtaining tags: %s", base)
@@ -209,7 +323,6 @@ def get_manifest(repo_name,namespace,repo_tag="latest",registry=None,auth=None,h
     '''
     if registry == None:
         registry = api_base
-    registry = add_http(registry) # make sure we have a complete url
 
     base = "%s/%s/%s/%s/manifests/%s" %(registry,api_version,namespace,repo_name,repo_tag)
     logger.info("Obtaining manifest: %s", base)
@@ -279,7 +392,6 @@ def get_layer(image_id,namespace,repo_name,download_folder=None,registry=None,au
     '''
     if registry == None:
         registry = api_base
-    registry = add_http(registry) # make sure we have a complete url
 
     # The <name> variable is the namespace/repo_name
     base = "%s/%s/%s/%s/blobs/%s" %(registry,api_version,namespace,repo_name,image_id)
