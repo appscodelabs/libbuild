@@ -335,25 +335,74 @@ def read_json(name):
         print(err)
         sys.exit(1)
 
-
 if __name__ == "__main__":
-    m1, h1 = version_info()
-    print h1.headers
-
     home = expanduser("~")
     config = read_json(home + "/.docker/config.json")
-    print config['auths']['https://index.docker.io/v1/']['auth']
-    # sys.exit(1)
+    s = config['auths']['https://index.docker.io/v1/']['auth']
+
+    if sys.version_info[0] >= 3:
+        s = bytes(s, 'utf-8')
+        credentials = base64.b64decode(s).decode('utf-8')
+    else:
+        credentials = base64.b64decode(s)
+
+    cred = credentials.split(':')
+    username = cred[0]
+    password = cred[1]
+
+    url = 'https://hub.docker.com/v2/users/login/'
+    data = urlencode({'username': username, 'password': password})
+    req = Request(url, data)
+    response = urlopen(req)
+    try:
+        body = response.read().decode('utf-8')
+        body = json.loads(body)
+        token = body['token']
+    except:
+        print("Error obtaining token")
+        sys.exit(1)
+
+    print token
+
+    namespace = 'appscode'
+    repo = 'voyager'
+    tag = '1.5.5-19-g220cdd1-dirty'
+    url = 'https://hub.docker.com/v2/repositories/%s/%s/tags/%s/' % (namespace, repo, tag)
+
+    headers = {
+        'Authorization': 'JWT %s' % token
+    }
+    request = Request(url=url, headers=headers)
+    request.get_method = lambda: 'DELETE'
+    try:
+        opener = build_opener(HTTPHandler)
+        response = opener.open(request)
+        body = response.read().decode('utf-8')
+        print body, response.headers
+    # If we have an HTTPError, try to follow the response
+    except HTTPError as err:
+        print("Failed to delete tag %s, exiting." % err)
+        sys.exit(1)
 
 
-    # print get_tags('appscode', 'voyager')
-    # print '\n\n\n\n\n'
-    m2, h2 = get_manifest('appscode', 'voyager', "1.5.5-5-g76c5a25", headers={
-        'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
-    })
-
-    print json.dumps(m2, sort_keys=True, indent=2, separators=(',', ': ')), h2['Docker-Content-Digest']
-    _, h3 = delete_manifest('appscode', 'voyager', h2['Docker-Content-Digest'], headers={
-        'Authorization': 'Basic ' + config['auths']['https://index.docker.io/v1/']['auth'],
-    })
-    print h3
+# if __name__ == "__main__":
+#     m1, h1 = version_info()
+#     print h1.headers
+#
+#     home = expanduser("~")
+#     config = read_json(home + "/.docker/config.json")
+#     print config['auths']['https://index.docker.io/v1/']['auth']
+#     # sys.exit(1)
+#
+#
+#     # print get_tags('appscode', 'voyager')
+#     # print '\n\n\n\n\n'
+#     m2, h2 = get_manifest('appscode', 'voyager', "1.5.5-5-g76c5a25", headers={
+#         'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
+#     })
+#
+#     print json.dumps(m2, sort_keys=True, indent=2, separators=(',', ': ')), h2['Docker-Content-Digest']
+#     _, h3 = delete_manifest('appscode', 'voyager', h2['Docker-Content-Digest'], headers={
+#         'Authorization': 'Basic ' + config['auths']['https://index.docker.io/v1/']['auth'],
+#     })
+#     print h3
