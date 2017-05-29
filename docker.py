@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 '''
+docker.py: Script to delete docker image tag from Docker Hub
 
-api.py: Docker helper functions for Singularity in Python
-
-Copyright (c) 2016, Vanessa Sochat. All rights reserved. 
+Copyright (c) 2017, AppsCode Inc. All rights reserved.
+Copyright (c) 2016, Vanessa Sochat. All rights reserved.
 
 "Singularity" Copyright (c) 2016, The Regents of the University of California,
 through Lawrence Berkeley National Laboratory (subject to receipt of any
@@ -26,12 +26,11 @@ perform publicly and display publicly, and to permit other to do so.
 # Needed for antipackage with python 2
 from __future__ import absolute_import
 
-import re
-import json
-import os
-import sys
-import tempfile
 import base64
+import json
+import re
+import sys
+from os.path import expanduser
 
 try:
     from urllib.parse import urlencode, urlparse
@@ -41,39 +40,13 @@ except ImportError:
     from urllib import urlencode, unquote
     from urlparse import urlparse
     from urllib2 import urlopen, Request, HTTPError
+    from urllib2 import build_opener, HTTPHandler
 
 api_base = "https://index.docker.io"
 api_version = "v2"
 
 
 # Authentication not required ---------------------------------------------------------------------------------
-
-def api_get_pagination(url):
-    '''api_pagination is a wrapper for "api_get" that will also handle pagination
-    :param url: the url to retrieve:
-    :param default_header: include default_header (above)
-    :param headers: headers to add (default is None)
-    '''
-    done = False
-    results = []
-    while not done:
-        response = api_get(url=url)
-        try:
-            response = json.loads(response)
-        except:
-            print("Error parsing response for url %s, exiting.", url)
-            sys.exit(1)
-
-        # If we have a next url
-        if "next" in response:
-            url = response["next"]
-        else:
-            done = True
-
-        # Add new call to the results
-        results = results + response['results']
-    return results
-
 
 def parse_headers(default_header, headers=None):
     '''parse_headers will return a completed header object, adding additional headers to some
@@ -100,23 +73,16 @@ def parse_headers(default_header, headers=None):
     return final_headers
 
 
-def api_get(url, data=None, default_header=True, headers=None, stream=None, return_response=False):
+def api_get(url, data=None, default_header=True, headers=None):
     '''api_get gets a url to the api with appropriate headers, and any optional data
     :param data: a dictionary of key:value items to add to the data args variable
-    :param url: the url to get
-    :param stream: The name of a file to stream the response to. If defined, will stream
-    default is None (will not stream)
+    :param path: the url to get
     :returns response: the requests response object
     '''
     headers = parse_headers(default_header=default_header,
                             headers=headers)
-
-    # Does the user want to stream a response?
-    do_stream = False
-    if stream != None:
-        do_stream = True
-
-    if data != None:
+    print url
+    if data:
         args = urlencode(data)
         request = Request(url=url,
                           data=args,
@@ -124,34 +90,113 @@ def api_get(url, data=None, default_header=True, headers=None, stream=None, retu
     else:
         request = Request(url=url,
                           headers=headers)
-
     try:
-        response = urlopen(request)
-
+        return urlopen(request)
     # If we have an HTTPError, try to follow the response
-    except HTTPError as error:
-        return error
+    except HTTPError as response:
+        if response.code != 401 or "WWW-Authenticate" not in response.headers:
+            print("Authentication error for registry, exiting.")
+            sys.exit(1)
 
-    # Does the call just want to return the response?
-    if return_response == True:
-        return response
+        challenge = response.headers["WWW-Authenticate"]
+        if not challenge.startswith('Bearer '):
+            print("Unrecognized authentication challenge from registry, exiting.")
+            sys.exit(1)
+        challenge = challenge[len('Bearer '):]
+        print challenge
+        d = {}
+        for x in challenge.split(','):
+            k, v = x.split('=')
+            d[k] = v.strip('"')
 
-    if do_stream == False:
-        return response.read().decode('utf-8')
+        realm = d['realm']
+        del d['realm']
+        base = "%s?%s" % (realm, urlencode(d))
+        print base
 
-    chunk_size = 1 << 20
-    with open(stream, 'wb') as filey:
-        while True:
-            chunk = response.read(chunk_size)
-            if not chunk:
-                break
-            try:
-                filey.write(chunk)
-            except:  # PermissionError
-                print("Cannot write to %s, exiting", stream)
-                sys.exit(1)
+        # challenge = response.headers["WWW-Authenticate"]
+        # match = re.match('^Bearer\s+realm="([^"]+)",service="([^"]+)",scope="([^"]+)"\s*$', challenge)
+        # if not match:
+        #     print("Unrecognized authentication challenge from registry, exiting.")
+        #     sys.exit(1)
+        #
+        # realm = match.group(1)
+        # service = match.group(2)
+        # scope = match.group(3)
+        #
+        # base = "%s?service=%s&scope=%s" % (realm, service, scope)
+        tokenHeaders = dict()
+        if "Authorization" in headers:
+            tokenHeaders["Authorization"] = headers["Authorization"]
 
-    return stream
+        response = api_get(base, default_header=False, headers=tokenHeaders)
+        try:
+            response = response.read().decode('utf-8')
+            token = json.loads(response)["token"]
+            token = {"Authorization": "Bearer %s" % token}
+            print token
+            return api_get(url, default_header=default_header, headers=token)
+        except:
+            print("Error getting token for repository, exiting.")
+            sys.exit(1)
+
+
+def api_delete(url, data=None, default_header=True, headers=None):
+    '''api_delete gets a url to the api with appropriate headers, and any optional data
+    :param data: a dictionary of key:value items to add to the data args variable
+    :param path: the url to get
+    :returns response: the requests response object
+    '''
+    headers = parse_headers(default_header=default_header,
+                            headers=headers)
+    print url
+    if data:
+        args = urlencode(data)
+        request = Request(url=url,
+                          data=args,
+                          headers=headers)
+    else:
+        request = Request(url=url,
+                          headers=headers)
+    request.get_method = lambda: 'DELETE'
+    try:
+        opener = build_opener(HTTPHandler)
+        return opener.open(request)
+    # If we have an HTTPError, try to follow the response
+    except HTTPError as response:
+        if response.code != 401 or "WWW-Authenticate" not in response.headers:
+            print("Authentication error for registry, exiting.")
+            sys.exit(1)
+
+        challenge = response.headers["WWW-Authenticate"]
+        if not challenge.startswith('Bearer '):
+            print("Unrecognized authentication challenge from registry, exiting.")
+            sys.exit(1)
+        challenge = challenge[len('Bearer '):]
+        print challenge
+        d = {}
+        for x in challenge.split(','):
+            k, v = x.split('=')
+            d[k] = v.strip('"')
+        print d, urlencode(d)
+
+        realm = d['realm']
+        del d['realm']
+        base = "%s?%s" % (realm, urlencode(d))
+        tokenHeaders = dict()
+        if "Authorization" in headers:
+            tokenHeaders["Authorization"] = headers["Authorization"]
+
+        response = api_get(base, default_header=False, headers=tokenHeaders)
+        try:
+            response = response.read().decode('utf-8')
+            token = json.loads(response)["token"]
+            token = {"Authorization": "Bearer %s" % token}
+            print token
+            return api_delete(url, default_header=default_header, headers=token)
+        except:
+            print("Error getting token for repository, exiting.")
+            sys.exit(1)
 
 
 def basic_auth_header(username, password):
@@ -170,275 +215,145 @@ def basic_auth_header(username, password):
     return auth
 
 
-def get_token(namespace, repo_name, registry=None, auth=None):
-    '''get_token uses HTTP basic authentication to get a token for Docker registry API V2 operations
-    :param namespace: the namespace for the image
-    :param repo_name: the name of the repo, eg "ubuntu"
-    :param registry: the docker registry to use
-    :param auth: authorization header (default None)
-    :: note
-            # https://docs.docker.com/registry/spec/auth/token/
-    '''
-    if registry == None:
-        registry = api_base
-
-    # Check if we need a token at all by probing the tags/list endpoint.  This
-    # is an arbitrary choice, ideally we should always attempt without a token
-    # and then retry with a token if we received a 401.
-    base = "%s/%s/%s/%s/tags/list" % (registry, api_version, namespace, repo_name)
-    response = api_get(base, default_header=False)
-    if not isinstance(response, HTTPError):
-        # No token required for registry.
-        return None
-
-    if response.code != 401 or "WWW-Authenticate" not in response.headers:
-        print("Authentication error for registry %s, exiting." % (registry))
-        sys.exit(1)
-
-    challenge = response.headers["WWW-Authenticate"]
-    match = re.match('^Bearer\s+realm="([^"]+)",service="([^"]+)",scope="([^"]+)"\s*$', challenge)
-    if not match:
-        print("Unrecognized authentication challenge from registry %s, exiting." % (registry))
-        sys.exit(1)
-
-    realm = match.group(1)
-    service = match.group(2)
-    scope = match.group(3)
-
-    base = "%s?service=%s&scope=%s" % (realm, service, scope)
-    headers = dict()
-    if auth is not None:
-        headers.update(auth)
-
-    response = api_get(base, default_header=False, headers=headers)
-    try:
-        token = json.loads(response)["token"]
-        token = {"Authorization": "Bearer %s" % (token)}
-        return token
-    except:
-        print("Error getting token for repository %s/%s, exiting." % (namespace, repo_name))
-        sys.exit(1)
-
-
 # Authentication required ---------------------------------------------------------------------------------
 # Docker Registry Version 2.0 Functions - IN USE
 
-
-def get_images(repo_name=None, namespace=None, manifest=None, repo_tag="latest", registry=None, auth=None):
-    '''get_images is a wrapper for get_manifest, but it additionally parses the repo_name and tag's
-    images and returns the complete ids
-    :param repo_name: the name of the repo, eg "ubuntu"
-    :param namespace: the namespace for the image, default is "library"
-    :param repo_tag: the repo tag, default is "latest"
-    :param registry: the docker registry url, default will use index.docker.io
-    '''
-
-    # Get full image manifest, using version 2.0 of Docker Registry API
-    if manifest == None:
-        if repo_name != None and namespace != None:
-
-            # Custom header to specify we want a list of the version 2 schema, meaning the correct order of digests returned (base to child)
-            headers = {
-                "Accept": 'application/vnd.docker.distribution.manifest.v2+json,application/vnd.docker.distribution.manifest.list.v2+json'}
-            manifest = get_manifest(repo_name=repo_name,
-                                    namespace=namespace,
-                                    repo_tag=repo_tag,
-                                    registry=registry,
-                                    headers=headers,
-                                    auth=auth)
-        else:
-            print("No namespace and repo name OR manifest provided, exiting.")
-            sys.exit(1)
-
-    digests = read_digests(manifest)
-    return digests
-
-
-def read_digests(manifest):
-    '''read_layers will return a list of layers from a manifest. The function is
-    intended to work with both version 1 and 2 of the schema
-    :param manifest: the manifest to read_layers from
-    '''
-
-    digests = []
-
-    # https://github.com/docker/distribution/blob/master/docs/spec/manifest-v2-2.md#image-manifest
-    if 'layers' in manifest:
-        layer_key = 'layers'
-        digest_key = 'digest'
-        print('Image manifest version 2.2 found.')
-
-    # https://github.com/docker/distribution/blob/master/docs/spec/manifest-v2-1.md#example-manifest
-    elif 'fsLayers' in manifest:
-        layer_key = 'fsLayers'
-        digest_key = 'blobSum'
-        print('Image manifest version 2.1 found.')
-
-    else:
-        print('Improperly formed manifest, layers or fsLayers must be present')
-        sys.exit(1)
-
-    for layer in manifest[layer_key]:
-        if digest_key in layer:
-            if layer[digest_key] not in digests:
-                print("Adding digest %s", layer[digest_key])
-                digests.append(layer[digest_key])
-    return digests
-
-
-def get_tags(namespace, repo_name, registry=None, auth=None):
+def version_info(registry=None, headers=None):
     '''get_tags will return the tags for a repo using the Docker Version 2.0 Registry API
     :param namespace: the namespace (eg, "library")
     :param repo_name: the name for the repo (eg, "ubuntu")
     :param registry: the docker registry to use (default will use index.docker.io)
-    :param auth: authorization header (default None)
+    :param headers: dictionary of custom headers to add to token header (to get more specific manifest)
     '''
-    if registry == None:
+    if registry is None:
         registry = api_base
 
-    base = "%s/%s/%s/%s/tags/list" % (registry, api_version, namespace, repo_name)
-    print("Obtaining tags: %s" % (base))
+    base = "%s/%s/" % (registry, api_version)
+    print("Obtaining registry v2 info: %s" % base)
 
-    token = get_token(registry=registry,
-                      repo_name=repo_name,
-                      namespace=namespace,
-                      auth=auth)
-
-    response = api_get(base, headers=token)
+    response = api_get(base, default_header=False, headers=headers)
     try:
-        response = json.loads(response)
-        return response['tags']
+        body = response.read().decode('utf-8')
+        body = json.loads(body)
+        return body, response.headers
     except:
-        print("Error obtaining tags: %s", base)
+        print("Error obtaining tags: %s" % base)
         sys.exit(1)
 
 
-def get_manifest(repo_name, namespace, repo_tag="latest", registry=None, auth=None, headers=None):
+def get_tags(namespace, repo_name, registry=None, headers=None):
+    '''get_tags will return the tags for a repo using the Docker Version 2.0 Registry API
+    :param namespace: the namespace (eg, "library")
+    :param repo_name: the name for the repo (eg, "ubuntu")
+    :param registry: the docker registry to use (default will use index.docker.io)
+    :param headers: dictionary of custom headers to add to token header (to get more specific manifest)
+    '''
+    if registry is None:
+        registry = api_base
+
+    base = "%s/%s/%s/%s/tags/list" % (registry, api_version, namespace, repo_name)
+    print("Obtaining tags: %s" % base)
+
+    response = api_get(base, default_header=False, headers=headers)
+    try:
+        body = response.read().decode('utf-8')
+        body = json.loads(body)
+        return body['tags'], response.headers
+    except:
+        print("Error obtaining tags: %s" % base)
+        sys.exit(1)
+
+
+def get_manifest(namespace, repo_name, repo_tag="latest", registry=None, headers=None):
     '''get_manifest should return an image manifest for a particular repo and tag. The token is expected to
     be from version 2.0 (function above)
-    :param repo_name: the name of the repo, eg "ubuntu"
     :param namespace: the namespace for the image, default is "library"
+    :param repo_name: the name of the repo, eg "ubuntu"
     :param repo_tag: the repo tag, default is "latest"
     :param registry: the docker registry to use (default will use index.docker.io)
-    :param auth: authorization header (default None)
     :param headers: dictionary of custom headers to add to token header (to get more specific manifest)
     '''
     if registry == None:
         registry = api_base
 
     base = "%s/%s/%s/%s/manifests/%s" % (registry, api_version, namespace, repo_name, repo_tag)
-    print("Obtaining manifest: %s", base)
+    print("Obtaining manifest: %s" % base)
 
-    # Format the token, and prepare a header
-    token = get_token(registry=registry,
-                      repo_name=repo_name,
-                      namespace=namespace,
-                      auth=auth)
+    print headers
 
-    # Add ['Accept'] header to specify version 2 of manifest
-    if headers != None:
-        if token != None:
-            token.update(headers)
-        else:
-            token = headers
-
-    response = api_get(base, headers=token, default_header=True)
+    response = api_get(base, headers=headers, default_header=False)
     try:
-        response = json.loads(response)
+        print response.headers
+        body = response.read().decode('utf-8')
+        body = json.loads(body)
+        return body, response.headers
     except:
         # If the call fails, give the user a list of acceptable tags
-        tags = get_tags(namespace=namespace,
-                        repo_name=repo_name,
-                        registry=registry,
-                        auth=auth)
+        tags, _ = get_tags(namespace=namespace,
+                           repo_name=repo_name,
+                           registry=registry,
+                           headers=headers)
         print("\n".join(tags))
-        print("Error getting manifest for %s/%s:%s, exiting.", namespace,
-              repo_name,
-              repo_tag)
+        print("Error getting manifest for %s/%s:%s, exiting." % (namespace, repo_name, repo_tag))
         print(
             "Error getting manifest for %s/%s:%s. Acceptable tags are listed above." % (namespace, repo_name, repo_tag))
         sys.exit(1)
 
-    return response
 
-
-def get_config(manifest, spec="Entrypoint"):
-    '''get_config returns a particular spec (default is Entrypoint) from a manifest obtained with get_manifest.
-    :param manifest: the manifest obtained from get_manifest
-    :param spec: the key of the spec to return, default is "Entrypoint"
-    '''
-
-    cmd = None
-    if "history" in manifest:
-        for entry in manifest['history']:
-            if 'v1Compatibility' in entry:
-                entry = json.loads(entry['v1Compatibility'])
-                if "config" in entry:
-                    if spec in entry["config"]:
-                        cmd = entry["config"][spec]
-
-    # Standard is to include commands like ['/bin/sh']
-    if isinstance(cmd, list):
-        cmd = "\n".join(cmd)
-    print("Found Docker command (%s) %s", spec, cmd)
-    return cmd
-
-
-def get_layer(image_id, namespace, repo_name, download_folder=None, registry=None, auth=None):
-    '''get_layer will download an image layer (.tar.gz) to a specified download folder.
-    :param image_id: the (full) image id to get the manifest for, required
-    :param namespace: the namespace (eg, "library")
-    :param repo_name: the repo name, (eg, "ubuntu")
-    :param download_folder: if specified, download to folder. Otherwise return response with raw data (not recommended)
+def delete_manifest(namespace, repo_name, digest, registry=None, headers=None):
+    '''delete_manifest deletes an image manifest for a particular repo and tag. The token is expected to
+    be from version 2.0 (function above)
+    :param namespace: the namespace for the image, default is "library"
+    :param repo_name: the name of the repo, eg "ubuntu"
+    :param digest: the content digest of a tag
     :param registry: the docker registry to use (default will use index.docker.io)
-    :param auth: authorization header (default None)
+    :param headers: dictionary of custom headers to add to token header (to get more specific manifest)
     '''
     if registry == None:
         registry = api_base
 
-    # The <name> variable is the namespace/repo_name
-    base = "%s/%s/%s/%s/blobs/%s" % (registry, api_version, namespace, repo_name, image_id)
-    print("Downloading layers from %s", base)
+    base = "%s/%s/%s/%s/manifests/%s" % (registry, api_version, namespace, repo_name, digest)
+    print("Deleting manifest: %s" % base)
 
-    # To get the image layers, we need a valid token to read the repo
-    token = get_token(registry=registry,
-                      repo_name=repo_name,
-                      namespace=namespace,
-                      auth=auth)
-
-    if download_folder != None:
-        download_folder = "%s/%s.tar.gz" % (download_folder, image_id)
-
-        # Update user what we are doing
-        print("Downloading layer %s" % image_id)
-
+    response = api_delete(base, headers=headers, default_header=True)
     try:
-        # Create temporary file with format .tar.gz.tmp.XXXXX
-        fd, tmp_file = tempfile.mkstemp(prefix=("%s.tmp." % download_folder))
-        os.close(fd)
-        response = api_get(base, headers=token, stream=tmp_file)
-        if isinstance(response, HTTPError):
-            print("Error downloading layer %s, exiting.", base)
-            sys.exit(1)
-        os.rename(tmp_file, download_folder)
+        print response.headers
+        body = response.read().decode('utf-8')
+        body = json.loads(body)
+        return body, response.headers
     except:
-        print("Removing temporary download file %s", tmp_file)
-        try:
-            os.remove(tmp_file)
-        except:
-            pass
+        print("Error deleting manifest for %s/%s with digest %s, exiting." % (namespace, repo_name, digest))
         sys.exit(1)
 
-    return download_folder
 
-
-# Under Development! ---------------------------------------------------------------------------------
-# Docker Registry Version 2.0 functions
-
-# TODO: this will let us get all Docker repos to generate images automatically
-def get_repositories():
-    base = "https://index.docker.io/v2/_catalog"
+# TODO: use unicode encoding
+def read_json(name):
+    try:
+        with open(name, 'r') as f:
+            return json.load(f)
+    except IOError as err:
+        print(err)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    get_tags('appscode', 'voyager')
+    m1, h1 = version_info()
+    print h1.headers
+
+    home = expanduser("~")
+    config = read_json(home + "/.docker/config.json")
+    print config['auths']['https://index.docker.io/v1/']['auth']
+    # sys.exit(1)
+
+
+    # print get_tags('appscode', 'voyager')
+    # print '\n\n\n\n\n'
+    m2, h2 = get_manifest('appscode', 'voyager', "1.5.5-5-g76c5a25", headers={
+        'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
+    })
+
+    print json.dumps(m2, sort_keys=True, indent=2, separators=(',', ': ')), h2['Docker-Content-Digest']
+    _, h3 = delete_manifest('appscode', 'voyager', h2['Docker-Content-Digest'], headers={
+        'Authorization': 'Basic ' + config['auths']['https://index.docker.io/v1/']['auth'],
+    })
+    print h3
