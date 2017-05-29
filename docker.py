@@ -192,13 +192,13 @@ def get_token(namespace, repo_name, registry=None, auth=None):
         return None
 
     if response.code != 401 or "WWW-Authenticate" not in response.headers:
-        print("Authentication error for registry %s, exiting.", registry)
+        print("Authentication error for registry %s, exiting." % (registry))
         sys.exit(1)
 
     challenge = response.headers["WWW-Authenticate"]
     match = re.match('^Bearer\s+realm="([^"]+)",service="([^"]+)",scope="([^"]+)"\s*$', challenge)
     if not match:
-        print("Unrecognized authentication challenge from registry %s, exiting.", registry)
+        print("Unrecognized authentication challenge from registry %s, exiting." % (registry))
         sys.exit(1)
 
     realm = match.group(1)
@@ -216,7 +216,7 @@ def get_token(namespace, repo_name, registry=None, auth=None):
         token = {"Authorization": "Bearer %s" % (token)}
         return token
     except:
-        print("Error getting token for repository %s/%s, exiting.", namespace, repo_name)
+        print("Error getting token for repository %s/%s, exiting." % (namespace, repo_name))
         sys.exit(1)
 
 
@@ -356,7 +356,7 @@ def get_manifest(repo_name, namespace, repo_tag="latest", registry=None, auth=No
               repo_name,
               repo_tag)
         print(
-        "Error getting manifest for %s/%s:%s. Acceptable tags are listed above." % (namespace, repo_name, repo_tag))
+            "Error getting manifest for %s/%s:%s. Acceptable tags are listed above." % (namespace, repo_name, repo_tag))
         sys.exit(1)
 
     return response
