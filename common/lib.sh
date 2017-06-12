@@ -66,7 +66,7 @@ detect_tag() {
     if [ "$git_tag" != '' ]; then
         TAG=$git_tag
         TAG_STRATEGY='git_tag'
-    elif [ "$git_branch" != 'master' ] && [ "$git_branch" != 'HEAD' ]; then
+    elif [ "$git_branch" != 'master' ] && [ "$git_branch" != 'HEAD' ] && [[ "$git_branch" != release-* ]]; then
         TAG=$git_branch
         TAG_STRATEGY='git_branch'
     else
