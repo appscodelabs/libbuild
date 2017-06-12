@@ -115,7 +115,8 @@ attic_up() {
 	local cmd="docker tag $DOCKER_REGISTRY/$IMG:$TAG docker.appscode.com/$IMG:$TAG"
 	echo $cmd; $cmd
 	cmd="docker push docker.appscode.com/$IMG:$TAG"
-	echo $cmd; $cmd
+	echo $cmd 
+	until $cmd; do echo "Try again"; done
 }
 
 hub_up() {
