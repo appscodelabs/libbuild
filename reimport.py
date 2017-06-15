@@ -37,7 +37,9 @@ BEGIN_IMPORT_REGEX = ur'import \(\s*'
 END_IMPORT_REGEX = ur'\)\s*'
 
 PKG_MAP = {
-    'k8s.io/kubernetes/pkg/api': ['k8s.io/apimachinery/pkg/apis/meta/v1', 'metav1'],
+    'k8s.io/client-go/tools/clientcmd': ['k8s.io/kubernetes/pkg/client/unversioned/clientcmd'],
+    'k8s.io/kubernetes/pkg/util/runtime': ['k8s.io/kubernetes/pkg/util/runtime'],
+    'k8s.io/kubernetes/pkg/api': ['k8s.io/client-go/pkg/api/v1', 'apiv1'],
     'k8s.io/kubernetes/pkg/api/errors': ['k8s.io/apimachinery/pkg/api/errors'],
     'k8s.io/kubernetes/pkg/api/errors':['k8s.io/apimachinery/pkg/api/errors', 'kerr'],
     'k8s.io/kubernetes/pkg/api/unversioned': ['k8s.io/apimachinery/pkg/apis/meta/v1', 'metav1'],
@@ -55,7 +57,9 @@ PKG_MAP = {
     'k8s.io/kubernetes/pkg/labels': ['k8s.io/apimachinery/pkg/labels'],
     'k8s.io/kubernetes/pkg/runtime': ['k8s.io/apimachinery/pkg/runtime'],
     'k8s.io/kubernetes/pkg/types': ['k8s.io/apimachinery/pkg/types'],
+    'k8s.io/kubernetes/pkg/util/intstr':['k8s.io/apimachinery/pkg/util/intstr'],
     'k8s.io/kubernetes/pkg/util/sets':['k8s.io/apimachinery/pkg/util/sets'],
+    'k8s.io/kubernetes/pkg/util/wait': ['k8s.io/apimachinery/pkg/util/wait'],
     'k8s.io/kubernetes/pkg/watch': ['k8s.io/apimachinery/pkg/watch'],
 }
 
