@@ -59,6 +59,7 @@ PKG_MAP = {
     'k8s.io/kubernetes/pkg/util/intstr':['k8s.io/apimachinery/pkg/util/intstr'],
     'k8s.io/kubernetes/pkg/util/runtime': ['k8s.io/apimachinery/pkg/util/runtime'],
     'k8s.io/kubernetes/pkg/util/sets':['k8s.io/apimachinery/pkg/util/sets'],
+    'k8s.io/kubernetes/pkg/util/strategicpatch': ['k8s.io/apimachinery/pkg/util/strategicpatch'],
     'k8s.io/kubernetes/pkg/util/wait': ['k8s.io/apimachinery/pkg/util/wait'],
     'k8s.io/kubernetes/pkg/watch': ['k8s.io/apimachinery/pkg/watch'],
 }
