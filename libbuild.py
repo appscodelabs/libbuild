@@ -38,6 +38,7 @@ def _goenv():
 
 
 GOENV = _goenv()
+GOPATH = GOENV["GOPATH"]
 GOHOSTOS = GOENV["GOHOSTOS"]
 GOHOSTARCH = GOENV["GOHOSTARCH"]
 GOC = 'go'
