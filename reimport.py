@@ -37,6 +37,8 @@ BEGIN_IMPORT_REGEX = ur'import \(\s*'
 END_IMPORT_REGEX = ur'\)\s*'
 
 PKG_MAP = {
+    'k8s.io/client-go/pkg/apis/apps/v1beta1': ['', 'apps'],
+
     'k8s.io/kubernetes/pkg/api': ['k8s.io/client-go/pkg/api/v1', 'apiv1'],
     'k8s.io/kubernetes/pkg/api/errors': ['k8s.io/apimachinery/pkg/api/errors', 'kerr'],
     'k8s.io/kubernetes/pkg/api/unversioned': ['k8s.io/apimachinery/pkg/apis/meta/v1', 'metav1'],
