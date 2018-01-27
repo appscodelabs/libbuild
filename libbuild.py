@@ -210,29 +210,28 @@ def go_build(name, goos, goarch, main, compress=False, upx=False):
         )
     die(call(cmd, cwd=REPO_ROOT))
 
-    if compress:
-        if upx and (goarch in ['amd64', '386']):
-            cmd = "upx --brute {bindir}/{name}-{goos}-{goarch}{ext}".format(
-                    name=name,
-                    goos=goos,
-                    goarch=goarch,
-                    bindir=bindir,
-                    ext='.exe' if goos == 'windows' else ''
-                )
-            die(call(cmd, cwd=REPO_ROOT))
-
-        if goos in ['windows']:
-            cmd = "zip {bindir}/{name}-{goos}-{goarch}.zip {bindir}/{name}-{goos}-{goarch}{ext}"
-        else:
-            cmd = "tar -cjvf {bindir}/{name}-{goos}-{goarch}.tar.bz2 {bindir}/{name}-{goos}-{goarch}{ext}"
-        cmd = cmd.format(
+    if upx and (goarch in ['amd64', '386']):
+        cmd = "upx --brute {bindir}/{name}-{goos}-{goarch}{ext}".format(
                 name=name,
                 goos=goos,
                 goarch=goarch,
                 bindir=bindir,
                 ext='.exe' if goos == 'windows' else ''
             )
-        die(call(cmd, cwd=REPO_ROOT))
+        die(call(cmd, cwd=REPO_ROOT + '/' + bindir))
+
+    if compress:
+        if goos in ['windows']:
+            cmd = "zip {name}-{goos}-{goarch}.zip {name}-{goos}-{goarch}{ext}"
+        else:
+            cmd = "tar -cjvf {name}-{goos}-{goarch}.tar.bz2 {name}-{goos}-{goarch}{ext}"
+        cmd = cmd.format(
+                name=name,
+                goos=goos,
+                goarch=goarch,
+                ext='.exe' if goos == 'windows' else ''
+            )
+        die(call(cmd, cwd=REPO_ROOT + '/' + bindir))
     print('')
 
 
