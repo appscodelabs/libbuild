@@ -211,7 +211,17 @@ def go_build(name, goos, goarch, main, compress=False):
     die(call(cmd, cwd=REPO_ROOT))
 
     if compress:
-        cmd = "upx --brute {bindir}/{name}-{goos}-{goarch}{ext}".format(
+        if goarch in ['amd64', 'i386']:
+            cmd = "upx --brute {bindir}/{name}-{goos}-{goarch}{ext}".format(
+                    name=name,
+                    goos=goos,
+                    goarch=goarch,
+                    bindir=bindir,
+                    ext='.exe' if goos == 'windows' else ''
+                )
+            die(call(cmd, cwd=REPO_ROOT))
+
+        cmd = "tar -cjvf {bindir}/{name}-{goos}-{goarch}.tar.bz2 {bindir}/{name}-{goos}-{goarch}{ext}".format(
                 name=name,
                 goos=goos,
                 goarch=goarch,
