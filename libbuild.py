@@ -150,7 +150,7 @@ def to_upper_camel(lower_snake):
 
 
 # ref: https://golang.org/cmd/go/
-def go_build(name, goos, goarch, main):
+def go_build(name, goos, goarch, main, compress=False):
     linker_opts = []
     if BIN_MATRIX[name].get('go_version', False):
         md = metadata(REPO_ROOT, goos, goarch)
@@ -209,6 +209,16 @@ def go_build(name, goos, goarch, main):
             main=main
         )
     die(call(cmd, cwd=REPO_ROOT))
+
+    if compress:
+        cmd = "upx --brute {bindir}/{name}-{goos}-{goarch}{ext}".format(
+                name=name,
+                goos=goos,
+                goarch=goarch,
+                bindir=bindir,
+                ext='.exe' if goos == 'windows' else ''
+            )
+        die(call(cmd, cwd=REPO_ROOT))
     print('')
 
 
