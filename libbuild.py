@@ -199,12 +199,11 @@ def go_build(name, goos, goarch, main, compress=False, upx=False):
             main=main
         )
     else:
-        cmd = "GOOS={goos} GOARCH={goarch} {cgo_env} {goc} build -gcflags=all=-trimpath={gopath} -asmflags=all=-trimpath={gopath} -o {bindir}/{name}-{goos}-{goarch}{ext} {cgo} {ldflags} {tags} {main}".format(
+        cmd = "GOOS={goos} GOARCH={goarch} {cgo_env} {goc} build -o {bindir}/{name}-{goos}-{goarch}{ext} {cgo} {ldflags} {tags} {main}".format(
             name=name,
             goc=GOC,
             goos=goos,
             goarch=goarch,
-            gopath=GOPATH,
             bindir=bindir,
             cgo_env=cgo_env,
             cgo=cgo,
