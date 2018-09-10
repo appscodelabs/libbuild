@@ -342,7 +342,7 @@ def _ungroup_go_imports(fname):
         f.truncate()
 
 def git_branch_exists(branch):
-    return call('git show-ref --quiet refs/heads/{0}'.format(branch), eoe=False, cwd=REPO_ROOT) == 0
+    return call('git show-ref --quiet refs/heads/{0}'.format(branch), cwd=REPO_ROOT) == 0
 
 
 def git_checkout(branch):
@@ -412,6 +412,10 @@ DEP_LIST = [
     {
       "package": "k8s.io/client-go",
       "version": "kubernetes-1.11.3"
+    },
+    {
+      "package": "k8s.io/kubernetes",
+      "version": "v1.11.3"
     },
     {
       "package": "k8s.io/kube-aggregator",
@@ -502,22 +506,22 @@ DEP_LIST = [
 
 def revendor():
     seed = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-    revendor_branch = 'depfixer-{0}'.format(self.seed)
+    revendor_branch = 'depfixer-{0}'.format(seed)
     print(REPO_ROOT)
 
     call('git reset HEAD --hard', cwd=REPO_ROOT)
     call('git clean -xfd', cwd=REPO_ROOT)
-    git_checkout('master', cwd=REPO_ROOT)
+    git_checkout('master')
     call('git pull --rebase origin master', cwd=REPO_ROOT)
-    git_checkout(revendor_branch, cwd=REPO_ROOT)
+    git_checkout(revendor_branch)
     with open(REPO_ROOT + '/glide.yaml', 'r+') as glide_file:
         glide_config = yaml.load(glide_file)
         glide_mod(glide_config)
         glide_write(glide_file, glide_config)
         call('glide slow', cwd=REPO_ROOT)
-        if git_requires_commit(cwd=REPO_ROOT):
+        if git_requires_commit():
             call('git add --all', cwd=REPO_ROOT)
-            call('git commit -s -a -m "Revendor api"', cwd=REPO_ROOT, eoe=False)
+            call('git commit -s -a -m "Revendor api"', cwd=REPO_ROOT)
             call('git push origin {0}'.format(revendor_branch), cwd=REPO_ROOT)
         else:
             call('git reset HEAD --hard', cwd=REPO_ROOT)
