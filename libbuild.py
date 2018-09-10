@@ -521,7 +521,7 @@ def revendor():
         call('glide slow', cwd=REPO_ROOT)
         if git_requires_commit():
             call('git add --all', cwd=REPO_ROOT)
-            call('git commit -s -a -m "Revendor api"', cwd=REPO_ROOT)
+            call('git commit -s -a -m "Use kubernetes-1.11.3"', cwd=REPO_ROOT)
             call('git push origin {0}'.format(revendor_branch), cwd=REPO_ROOT)
         else:
             call('git reset HEAD --hard', cwd=REPO_ROOT)
