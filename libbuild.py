@@ -422,6 +422,10 @@ DEP_LIST = [
       "version": "kubernetes-1.11.3"
     },
     {
+      "package": "k8s.io/metrics",
+      "version": "kubernetes-1.11.3"
+    },
+    {
       "package": "k8s.io/kube-openapi",
       "version": "master"
     },
