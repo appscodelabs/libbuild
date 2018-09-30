@@ -413,7 +413,11 @@ REQUIRED_DEPS = [
     {
       "package": "golang.org/x/sys",
       "version": "95c6576299259db960f6c5b9b69ea52422860fce"
-    }
+    },
+    {
+      "package": "k8s.io/kube-openapi",
+      "version": "91cfa479c814065e420cee7ed227db0f63a5854e"
+    },
 ]
 DEP_LIST = [
     {
@@ -465,10 +469,6 @@ DEP_LIST = [
     {
       "package": "k8s.io/metrics",
       "version": "kubernetes-1.11.3"
-    },
-    {
-      "package": "k8s.io/kube-openapi",
-      "version": "master"
     },
     {
       "package": "github.com/appscode/kutil",
