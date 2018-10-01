@@ -387,12 +387,12 @@ def glide_write(f, glide_config):
 
 REQUIRED_DEPS = [
     {
-        'package': 'github.com/cpuguy83/go-md2man',
-        'version': 'v1.0.8',
+      "package": "github.com/cpuguy83/go-md2man",
+      "version": "v1.0.8"
     },
     {
-        'package': 'github.com/json-iterator/go',
-        'version': '1.1.5',
+      "package": "github.com/json-iterator/go",
+      "version": "1.1.5"
     },
     {
       "package": "github.com/spf13/cobra",
@@ -419,22 +419,22 @@ REQUIRED_DEPS = [
       "version": "91cfa479c814065e420cee7ed227db0f63a5854e"
     },
     {
-        "package": "google.golang.org/genproto",
-        "version": "09f6ed296fc66555a25fe4ce95173148778dfa85"
-    },
+      "package": "github.com/golang/protobuf",
+      "version": "v1.1.0"
+    }
 ]
 DEP_LIST = [
     {
-        'package': 'github.com/cpuguy83/go-md2man',
-        'version': 'v1.0.8',
+        "package": "github.com/cpuguy83/go-md2man",
+        "version": "v1.0.8"
     },
     {
-        'package': 'github.com/json-iterator/go',
-        'version': '1.1.5',
+        "package": "github.com/json-iterator/go",
+        "version": "1.1.5"
     },
     {
-        'package': 'github.com/coreos/prometheus-operator',
-        'version': 'v0.23.2',
+        "package": "github.com/coreos/prometheus-operator",
+        "version": "v0.23.2"
     },
     {
       "package": "k8s.io/api",
@@ -545,7 +545,7 @@ DEP_LIST = [
     {
       "package": "cloud.google.com/go",
       "version": "v0.2.0"
-    },
+    }
 ]
 
 
