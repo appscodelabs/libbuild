@@ -418,6 +418,10 @@ REQUIRED_DEPS = [
       "package": "k8s.io/kube-openapi",
       "version": "91cfa479c814065e420cee7ed227db0f63a5854e"
     },
+    {
+        "package": "google.golang.org/genproto",
+        "version": "09f6ed296fc66555a25fe4ce95173148778dfa85"
+    },
 ]
 DEP_LIST = [
     {
