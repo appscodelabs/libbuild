@@ -421,6 +421,10 @@ REQUIRED_DEPS = [
     {
       "package": "github.com/golang/protobuf",
       "version": "v1.1.0"
+    },
+    {
+      "package": "github.com/davecgh/go-spew",
+      "version": "v1.1.1"
     }
 ]
 DEP_LIST = [
