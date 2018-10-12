@@ -442,7 +442,7 @@ DEP_LIST = [
     },
     {
       "package": "github.com/coreos/prometheus-operator",
-      "repo": "https://github.com/tamalsaha/prometheus-operator.git",
+      "repo": "https://github.com/kmodules/prometheus-operator.git",
       "vcs": "git",
       "version": "k-1.12"
     },
@@ -456,13 +456,13 @@ DEP_LIST = [
     },
     {
       "package": "k8s.io/apimachinery",
-      "repo": "https://github.com/pharmer/apimachinery.git",
+      "repo": "https://github.com/kmodules/apimachinery.git",
       "vcs": "git",
       "version": "ac-1.12.0"
     },
     {
       "package": "k8s.io/apiserver",
-      "repo": "https://github.com/pharmer/apiserver.git",
+      "repo": "https://github.com/kmodules/apiserver.git",
       "vcs": "git",
       "version": "ac-1.12.0"
     },
