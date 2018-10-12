@@ -555,7 +555,7 @@ DEP_LIST = [
 
 def revendor():
     seed = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-    revendor_branch = 'depfixer-{0}'.format(seed)
+    revendor_branch = 'k-1.12'
     print(REPO_ROOT)
 
     call('git reset HEAD --hard', cwd=REPO_ROOT)
@@ -570,7 +570,7 @@ def revendor():
         call('glide slow', cwd=REPO_ROOT)
         if git_requires_commit():
             call('git add --all', cwd=REPO_ROOT)
-            call('git commit -s -a -m "Use kubernetes-1.12.0"', cwd=REPO_ROOT)
+            call('git commit -s -a -m "Update kubernetes client libraries to 1.12.0"', cwd=REPO_ROOT)
             call('git push origin {0}'.format(revendor_branch), cwd=REPO_ROOT)
         else:
             call('git reset HEAD --hard', cwd=REPO_ROOT)
