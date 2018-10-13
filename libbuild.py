@@ -555,7 +555,7 @@ DEP_LIST = [
 
 def revendor():
     seed = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-    revendor_branch = 'k-1.12'
+    revendor_branch = 'k-1.12.0'
     print(REPO_ROOT)
 
     call('git reset HEAD --hard', cwd=REPO_ROOT)
