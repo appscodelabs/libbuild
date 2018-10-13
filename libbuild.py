@@ -400,7 +400,7 @@ REQUIRED_DEPS = [
     },
     {
       "package": "github.com/spf13/pflag",
-      "version": "v1.0.1"
+      "version": "v1.0.3"
     },
     {
       "package": "golang.org/x/text",
@@ -553,6 +553,14 @@ DEP_LIST = [
     {
       "package": "github.com/spf13/afero",
       "version": "v1.1.2"
+    },
+    {
+      "package": "github.com/appscode/osm",
+      "version": "0.9.0"
+    },
+    {
+      "package": "github.com/kubepack/onessl",
+      "version": "0.9.0"
     }
 ]
 
@@ -568,7 +576,7 @@ def revendor():
     call('git pull --rebase origin master', cwd=REPO_ROOT)
     git_checkout(revendor_branch)
     # https://stackoverflow.com/a/6759339/244009
-    call("find " + REPO_ROOT + "/apis -type f -exec sed -i -e 's/k8s.io\\/apimachinery\\/pkg\\/api\\/testing\\/roundtrip/k8s.io\\/apimachinery\\/pkg\\/api\\/apitesting\\/roundtrip/g' {} \;")
+    call("find " + REPO_ROOT + "/apis -type f -exec sed -i -e 's/k8s.io\\/apimachinery\\/pkg\\/api\\/testing\\/roundtrip/k8s.io\\/apimachinery\\/pkg\\/api\\/apitesting\\/roundtrip/g' {} \;", eoe=False)
     with open(REPO_ROOT + '/glide.yaml', 'r+') as glide_file:
         glide_config = yaml.load(glide_file)
         glide_mod(glide_config)
