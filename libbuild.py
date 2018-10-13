@@ -471,6 +471,10 @@ DEP_LIST = [
       "version": "v9.0.0"
     },
     {
+      "package": "k8s.io/cli-runtime",
+      "version": "kubernetes-1.12.0"
+    },
+    {
       "package": "k8s.io/kubernetes",
       "version": "v1.12.0"
     },
