@@ -391,6 +391,10 @@ REQUIRED_DEPS = [
       "version": "v1.0.8"
     },
     {
+      "package": "github.com/russross/blackfriday",
+      "version": "v2.0.1"
+    },
+    {
       "package": "github.com/json-iterator/go",
       "version": "1.1.5"
     },
