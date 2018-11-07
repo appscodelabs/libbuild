@@ -582,7 +582,7 @@ def revendor():
     call('git pull --rebase origin master', cwd=REPO_ROOT)
     git_checkout(revendor_branch)
     # https://stackoverflow.com/a/6759339/244009
-    call("find " + REPO_ROOT + "/apis -type f -exec sed -i -e 's/k8s.io\\/apimachinery\\/pkg\\/api\\/testing\\/roundtrip/k8s.io\\/apimachinery\\/pkg\\/api\\/apitesting\\/roundtrip/g' {} \;", eoe=False)
+    call("find " + REPO_ROOT + "/apis -type f -exec sed -i -e 's/k8s.io\\/apimachinery\\/pkg\\/api\\/testing\\/roundtrip/k8s.io\\/apimachinery\\/pkg\\/api\\/apitesting\\/roundtrip/g' {} \;")
     with open(REPO_ROOT + '/glide.yaml', 'r+') as glide_file:
         glide_config = yaml.load(glide_file)
         glide_mod(glide_config)
