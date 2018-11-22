@@ -590,7 +590,7 @@ def revendor():
         call('glide slow', cwd=REPO_ROOT)
         if git_requires_commit():
             call('git add --all', cwd=REPO_ROOT)
-            call('git commit -s -a -m "Update kubernetes client libraries to 1.12.0"', cwd=REPO_ROOT)
+            call('git commit -s -a -m "Update Kubernetes client libraries to 1.12.0"', cwd=REPO_ROOT)
             call('git push origin {0}'.format(revendor_branch), cwd=REPO_ROOT)
         else:
             call('git reset HEAD --hard', cwd=REPO_ROOT)
