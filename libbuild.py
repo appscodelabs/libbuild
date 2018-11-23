@@ -437,6 +437,10 @@ REQUIRED_DEPS = [
     {
       "package": "gopkg.in/yaml.v2",
       "version": "v2.2.1"
+    },
+    {
+      "package": "github.com/gorilla/websocket",
+      "version": "v1.4.0"
     }
 ]
 DEP_LIST = [
