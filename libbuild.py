@@ -441,7 +441,11 @@ REQUIRED_DEPS = [
     {
       "package": "github.com/gorilla/websocket",
       "version": "v1.4.0"
-    }
+    },
+    {
+      "package": "gopkg.in/square/go-jose.v2",
+      "version": "v2.2.0"
+    }    
 ]
 DEP_LIST = [
     {
