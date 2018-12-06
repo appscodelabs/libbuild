@@ -444,7 +444,7 @@ REQUIRED_DEPS = [
     },
     {
       "package": "gopkg.in/square/go-jose.v2",
-      "version": "v2.2.0"
+      "version": "v2.2.1"
     }    
 ]
 DEP_LIST = [
