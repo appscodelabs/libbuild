@@ -429,7 +429,7 @@ REQUIRED_DEPS = [
     },
     {
       "package": "github.com/golang/protobuf",
-      "version": "v1.1.0"
+      "version": "v1.0.0"
     },
     {
       "package": "github.com/davecgh/go-spew",
