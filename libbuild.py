@@ -359,6 +359,10 @@ def git_requires_commit():
     return Counter(changed_files) != Counter(['glide.lock'])
 
 
+def sortDep(val):
+    return val['package']
+
+
 def glide_mod(glide_config):
     for x in REQUIRED_DEPS:
         for idx, dep in enumerate(glide_config['import']):
@@ -374,6 +378,7 @@ def glide_mod(glide_config):
             if dep['package'] == x['package']:
                 glide_config['import'][idx] = x
                 break
+    glide_config['import'].sort(key=sortDep)
 
 
 def glide_write(f, glide_config):
