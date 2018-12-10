@@ -445,7 +445,11 @@ REQUIRED_DEPS = [
     {
       "package": "gopkg.in/square/go-jose.v2",
       "version": "v2.2.1"
-    }    
+    },
+    {
+	  "package": "github.com/imdario/mergo",
+	  "version": "v0.3.5"
+    }
 ]
 DEP_LIST = [
     {
