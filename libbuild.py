@@ -378,6 +378,11 @@ def glide_mod(glide_config):
             if dep['package'] == x['package']:
                 glide_config['import'][idx] = x
                 break
+    for package in DELETE_LIST:
+        for idx, dep in enumerate(glide_config['import']):
+            if dep['package'] == package:
+                del glide_config['import'][idx]
+                break
     glide_config['import'].sort(key=sortDep)
 
 
@@ -571,7 +576,7 @@ DEP_LIST = [
     },
     {
       "package": "cloud.google.com/go",
-      "version": "v0.2.0"
+      "version": "v0.23.0"
     },
     {
       "package": "github.com/spf13/afero",
@@ -579,12 +584,18 @@ DEP_LIST = [
     },
     {
       "package": "github.com/appscode/osm",
-      "version": "0.9.0"
+      "version": "0.9.1"
     },
     {
       "package": "github.com/kubepack/onessl",
       "version": "0.9.0"
     }
+]
+DELETE_LIST=[
+    "github.com/openshift/api",
+    "github.com/openshift/client-go",
+    "github.com/openshift/origin",
+    "github.com/appscode/ocutil"
 ]
 
 
