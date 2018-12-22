@@ -184,7 +184,7 @@ def go_build(name, goos, goarch, main, compress=False, upx=False):
     if goos == 'alpine':
         repo_dir = REPO_ROOT[len(GOPATH):]
         uid = check_output('id -u').strip()
-        cmd = "docker run --rm -u {uid} -v /tmp:/.cache -v {repo_root}:/go{repo_dir} -w /go{repo_dir} -e {cgo_env} golang:1.11.3-alpine {goc} build -o {bindir}/{name}-{goos}-{goarch}{ext} {cgo} {ldflags} {tags} {main}".format(
+        cmd = "docker run --rm -u {uid} -v /tmp:/.cache -v {repo_root}:/go{repo_dir} -w /go{repo_dir} -e {cgo_env} golang:1.11.4-alpine {goc} build -o {bindir}/{name}-{goos}-{goarch}{ext} {cgo} {ldflags} {tags} {main}".format(
             repo_root=REPO_ROOT,
             repo_dir=repo_dir,
             uid=uid,
@@ -457,8 +457,12 @@ REQUIRED_DEPS = [
       "version": "v2.2.1"
     },
     {
-	  "package": "github.com/imdario/mergo",
-	  "version": "v0.3.5"
+      "package": "github.com/imdario/mergo",
+      "version": "v0.3.5"
+    },
+    {
+      "package": "github.com/mitchellh/mapstructure",
+      "version": "v1.1.2"
     }
 ]
 DEP_LIST = [
