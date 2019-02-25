@@ -471,6 +471,10 @@ REQUIRED_DEPS = [
     {
       "package": "gopkg.in/ini.v1",
       "version": "v1.40.0"
+    },
+    {
+      "package": "github.com/mailru/easyjson",
+      "version": "2f5df55504ebc322e4d52d34df6a1f5b503bf26d"
     }
 ]
 DEP_LIST = [
