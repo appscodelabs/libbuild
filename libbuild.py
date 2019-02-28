@@ -595,6 +595,10 @@ DEP_LIST = [
     {
       "package": "github.com/kubepack/onessl",
       "version": "0.11.0"
+    },
+    {
+      "package": "github.com/prometheus/client_golang",
+      "version": "v0.9.2"
     }
 ]
 DELETE_LIST=[
