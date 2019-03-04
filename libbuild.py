@@ -475,6 +475,10 @@ REQUIRED_DEPS = [
     {
       "package": "github.com/mailru/easyjson",
       "version": "2f5df55504ebc322e4d52d34df6a1f5b503bf26d"
+    },
+    {
+      "package": "sigs.k8s.io/yaml",
+      "version": "v1.1.0"
     }
 ]
 DEP_LIST = [
