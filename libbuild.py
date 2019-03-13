@@ -479,6 +479,22 @@ REQUIRED_DEPS = [
     {
       "package": "sigs.k8s.io/yaml",
       "version": "v1.1.0"
+    },
+    {
+      "package": "github.com/prometheus/client_golang",
+      "version": "v0.9.2"
+    },
+    {
+      "package": "k8s.io/utils",
+      "version": "66066c83e385e385ccc3c964b44fd7dcd413d0ed"
+    },
+    {
+      "package": "github.com/evanphx/json-patch",
+      "version": "5858425f75500d40c52783dce87d085a483ce135"
+    },
+    {
+      "package": "github.com/google/go-cmp",
+      "version": "6f77996f0c42f7b84e5a2b252227263f93432e9b"
     }
 ]
 DEP_LIST = [
@@ -599,10 +615,6 @@ DEP_LIST = [
     {
       "package": "github.com/kubepack/onessl",
       "version": "0.11.0"
-    },
-    {
-      "package": "github.com/prometheus/client_golang",
-      "version": "v0.9.2"
     }
 ]
 DELETE_LIST=[
