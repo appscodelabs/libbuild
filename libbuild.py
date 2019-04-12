@@ -495,6 +495,10 @@ REQUIRED_DEPS = [
     {
       "package": "github.com/google/go-cmp",
       "version": "6f77996f0c42f7b84e5a2b252227263f93432e9b"
+    },
+    {
+      "package": "github.com/soheilhy/cmux",
+      "version": "8a8ea3c53959009183d7914522833c1ed8835020"
     }
 ]
 DEP_LIST = [
