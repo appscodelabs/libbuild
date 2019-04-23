@@ -499,6 +499,14 @@ REQUIRED_DEPS = [
     {
       "package": "github.com/soheilhy/cmux",
       "version": "8a8ea3c53959009183d7914522833c1ed8835020"
+    },
+    {
+        "package": "github.com/go-openapi/spec",
+        "version": "v0.17.2"
+    },
+    {
+        "package": "github.com/go-openapi/swag",
+        "version": "v0.17.2"
     }
 ]
 DEP_LIST = [
