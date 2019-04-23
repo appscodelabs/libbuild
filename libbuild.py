@@ -516,43 +516,43 @@ DEP_LIST = [
     },
     {
       "package": "k8s.io/api",
-      "version": "kubernetes-1.13.0"
+      "version": "kubernetes-1.13.5"
     },
     {
       "package": "k8s.io/apiextensions-apiserver",
-      "version": "kubernetes-1.13.0"
+      "version": "kubernetes-1.13.5"
     },
     {
       "package": "k8s.io/apimachinery",
       "repo": "https://github.com/kmodules/apimachinery.git",
       "vcs": "git",
-      "version": "ac-1.13.0"
+      "version": "ac-1.13.5"
     },
     {
       "package": "k8s.io/apiserver",
       "repo": "https://github.com/kmodules/apiserver.git",
       "vcs": "git",
-      "version": "ac-1.13.0"
+      "version": "ac-1.13.5"
     },
     {
       "package": "k8s.io/client-go",
-      "version": "v10.0.0"
+      "version": "kubernetes-1.13.5"
     },
     {
       "package": "k8s.io/cli-runtime",
-      "version": "kubernetes-1.13.0"
+      "version": "kubernetes-1.13.5"
     },
     {
       "package": "k8s.io/kubernetes",
-      "version": "v1.13.0"
+      "version": "v1.13.5"
     },
     {
       "package": "k8s.io/kube-aggregator",
-      "version": "kubernetes-1.13.0"
+      "version": "kubernetes-1.13.5"
     },
     {
       "package": "k8s.io/metrics",
-      "version": "kubernetes-1.13.0"
+      "version": "kubernetes-1.13.5"
     },
     {
       "package": "kmodules.xyz/client-go",
@@ -631,7 +631,7 @@ DELETE_LIST=[
 
 def revendor():
     seed = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-    revendor_branch = 'k-1.13.0'
+    revendor_branch = 'k-1.13.5'
     print(REPO_ROOT)
 
     call('git reset HEAD --hard', cwd=REPO_ROOT)
@@ -648,7 +648,7 @@ def revendor():
         call('glide slow', cwd=REPO_ROOT)
         if git_requires_commit():
             call('git add --all', cwd=REPO_ROOT)
-            call('git commit -s -a -m "Update Kubernetes client libraries to 1.13.0"', cwd=REPO_ROOT)
+            call('git commit -s -a -m "Update Kubernetes client libraries to 1.13.5"', cwd=REPO_ROOT)
             call('git push origin {0}'.format(revendor_branch), cwd=REPO_ROOT)
         else:
             call('git reset HEAD --hard', cwd=REPO_ROOT)
